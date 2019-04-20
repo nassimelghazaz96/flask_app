@@ -175,7 +175,7 @@ app.layout = html.Div([
 ], className='ten columns offset-by-one',
 )
 
-], className='row', style={'backgroundColor':'#333333', 'height': '100000px !veryimportant' })
+], className='row', style={'backgroundColor':'black', 'height': '100000px !veryimportant' })
 
 
 @app.callback(
@@ -208,6 +208,16 @@ def update_graph1(n_clicks,selected_values):
     figure = {
         'data': arranged_data,
         'layout': {
+            'margin' : go.layout.Margin(
+                        l=0,
+                        r=0,
+                        b=0,
+                        t=30,
+                        pad=4
+                    ),
+
+
+
             'title': 'Graph 1',
 
             'font' : dict(family='Courier New, monospace', size=15, color=text_color),
@@ -223,9 +233,8 @@ def update_graph1(n_clicks,selected_values):
                     size=15,
                     color=text_color
                 ),
-                linecolor = 'white',
-                linewidth = 2,
-                mirror = True
+
+                showgrid=False
             ),
             'yaxis': dict(
                 title='montant net TCC',
@@ -239,9 +248,10 @@ def update_graph1(n_clicks,selected_values):
                     size=15,
                     color=text_color
                 ),
-                linecolor='white',
-                linewidth=2,
-                mirror=True
+
+                showgrid=False,
+
+
             ),
             'paper_bgcolor':'rgba(0,0,0,0)',
             'plot_bgcolor' :'rgba(0,0,0,0)',
@@ -278,6 +288,8 @@ def update_graph2(n_clicks,selected_values):
                     size=15,
                     color=text_color
                 ),
+                showgrid=False,
+
             ),
             'yaxis': dict(
                 title='montant net TCC',
@@ -291,6 +303,8 @@ def update_graph2(n_clicks,selected_values):
                     size=15,
                     color=text_color
                 ),
+                showgrid=False,
+                showline=True
             ),
             'paper_bgcolor': 'rgba(0,0,0,0)',
             'plot_bgcolor': 'rgba(0,0,0,0)'
@@ -313,6 +327,7 @@ def update_graph3(n_clicks,selected_villes):
         ],
         layout=go.Layout(
             title='Distribution des revenus par jour',
+            font = dict(family='Courier New, monospace', size=15, color=text_color),
             paper_bgcolor = 'rgba(0,0,0,0)',
             plot_bgcolor = 'rgba(0,0,0,0)'
         )
@@ -328,11 +343,12 @@ def update_graph4(n_clicks,selected_values):
     lat=[]
     long=[]
     text=[]
-
+    ca=[]
     for ville in selected_values:
         lat.append(data[ville]['lat'])
         long.append(data[ville]['long'])
         text+=ville
+        ca.append(sum(data[ville]['y'])*0.004)
 
     figure=go.Figure(
             data = [
@@ -341,14 +357,19 @@ def update_graph4(n_clicks,selected_values):
                     lon=long,
                     mode='markers',
                     marker=go.scattermapbox.Marker(
-                        size=9
+                        #size=9
+                        size= ca,
+                        sizeref = 0.1,
+                        sizemin = 1,
+                        sizemode = 'diameter'
                     ),
                     text=text,
                 )
             ],
 
             layout = go.Layout(
-                autosize=True,
+                #autosize=True,
+                height=400,
                 hovermode='closest',
                 mapbox=go.layout.Mapbox(
                     accesstoken=mapbox_access_token,
@@ -362,17 +383,24 @@ def update_graph4(n_clicks,selected_values):
                     style='dark'
                 ),
                 paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)'
+                plot_bgcolor='rgba(0,0,0,0)',
+                margin=go.layout.Margin(
+                    l=0,
+                    r=0,
+                    b=0,
+                    t=0,
+                    pad=4
+                ),
             )
     )
     return figure
 
 
 #Test Spinner
-@app.callback(Output("loading-output-1", "children"), [Input("input-1", "value")])
-def input_triggers_spinner(value):
-    time.sleep(5000)
-    return value
+# @app.callback(Output("loading-output-1", "children"), [Input("input-1", "value")])
+# def input_triggers_spinner(value):
+#     time.sleep(5000)
+#     return value
 
 if __name__ == "__main__":
     app.run_server(debug=True)
